@@ -1,13 +1,13 @@
 import express from "express";
 import path from "path";
 import { ENV } from "./lib/env.js"
+import { connectDB } from "./lib/db.js";
 const app= express()
 
 const __dirname = path.resolve() /* this maintains the right address for any OS
 and dirname name is used to store the absolute path, deosnt matter from where you run the server, this si just a standarad variables */
 
 console.log(ENV.PORT)
-console.log(ENV.DB_URL)
 app.get('/',(req,res)=>{
    return res.status(200).json({msg:"sucess from api"})
 })
@@ -54,8 +54,15 @@ app.get('/{*any}',(req,res)=>{
 })
 }
 
-app.listen(3000,()=>{
-    return(
+const startServer = async()=>{
+    try{
+    await connectDB() //if u remove await then also it will work but buttom code will execute first
+    app.listen(3000,()=>
         console.log("Server is running on port",ENV.PORT)
     )
-})
+    } catch(error){
+        console.log("Error starting the server",error)
+    }
+}
+
+startServer()
