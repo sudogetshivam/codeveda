@@ -4,6 +4,22 @@ import User from "../models/User.js"
 
 export const inngest = new Inngest({id: "TalentIQ"});
 
+//this is how things work
+//--------------------------------------------------------------------------------------------
+/* // Ye Inngest Library ka internal hidden code hai
+constructor(options) {
+   this.id = options.id;
+   
+   // 👇 LIBRARY KHUD DHOONDTI HAI!
+   // Agar user ne key nahi di, toh main khud .env check karunga
+   this.eventKey = options.eventKey || process.env.INNGEST_EVENT_KEY;
+   this.signingKey = options.signingKey || process.env.INNGEST_SIGNING_KEY;
+} */
+
+
+// INNGEST_EVENT_KEY these types of variable speilling s are very imp because if you misspell even by a single character it will not work
+//--
+
 const syncUser =  inngest.createFunction(
     {id:"sync-user"},
     {event:"clerk/user.created"},
