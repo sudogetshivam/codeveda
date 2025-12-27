@@ -5,6 +5,9 @@ import { connectDB } from "./lib/db.js";
 import cors from "cors"
 import {serve} from "inngest/express"
 import { functions, inngest } from "./lib/inngest.js";
+import {clerkMiddleware} from "@clerk/express"
+import { protectRoute } from "./middleware/protectRoute.js";
+import chatRoutes from "./routes/chatRoutes.js"
 
 const app= express()
 
@@ -17,16 +20,21 @@ app.use(cors({
     origin: ENV.CLIENT_URL,
     credentials:true //allows cookies/tokens to enter or to come along with
 }))
+
+app.use(clerkMiddleware()) //this adds auth feild to request object: req.auth
 console.log(ENV.PORT)
 app.get('/',(req,res)=>{
    return res.status(200).json({msg:"sucess from api"})
 })
 
-app.use('/api/inngest',serve({client:inngest, functions}))
+app.use('/api/inngest',protectRoute,serve({client:inngest, functions}))
+app.use("/api/chat",chatRoutes)
 
-app.get('/books',(req,res)=>{
+//as protect route is an array so waht express does is, when you pass an array of middleware to express, it automatically flattens and executes them sequentially one by one
+app.get('/books',protectRoute,(req,res)=>{
    return res.status(200).json({msg:"This is the books endpoint"})
 })
+
 
 if(ENV.NODE_ENV === "production"){
     app.use(express.static(path.join(__dirname,"../frontend/dist")))
