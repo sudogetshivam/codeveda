@@ -39,7 +39,7 @@ export async function createSession(req,res){
       res.status(201).json({session})
      } catch (error) {  
         console.log("Error in createSession controller: ",error.message)
-        res.status(500).json({message: "Internal server error"})
+        return res.status(500).json({message: "Internal server error"})
      }
 
 }
@@ -54,7 +54,7 @@ export async function getActiveSessions(req,res){ // here req is not being used 
        res.status(200).json({sessions})
    } catch (error) {
        console.log("Error in getActiveSessions controller: ",error.message)
-        res.status(500).json({message: "Internal server error"})
+       return res.status(500).json({message: "Internal server error"})
    }
 }
 
@@ -67,7 +67,7 @@ export async function getMyRecentSessions(req,res){
          $or:[{host:userId},{participant:userId}],
    }).sort({createdAt:-1}).limit(20);
 
-   res.status(200).json(sessions)
+   return res.status(200).json(sessions)
       
    } catch (error) {
       console.log("Error in getMyRecentSessions controller: ",error.message)
@@ -94,7 +94,7 @@ const id = params.id;      // Phir usme se id nikalo
    res.status(200).json(message)
 } catch (error) {
    console.log("Error in getSessionById controller: ",error.message)
-   res.status(500).json({message: "Internal server error"})
+  return res.status(500).json({message: "Internal server error"})
 }
 
 }
@@ -167,11 +167,11 @@ export async function endSession(req,res){
       session.status = "completed"
       await session.save()
 
-      res.status(200).json({session,message:"Session ended successfully"})
+     return res.status(200).json({session,message:"Session ended successfully"})
 
 
    } catch (error) {
       console.log("Error in endSession controller: ",error.message)
-      res.status(500).json({message: "Internal server error"})
+      return res.status(500).json({message: "Internal server error"})
    }
 }
