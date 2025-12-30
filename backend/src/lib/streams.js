@@ -1,5 +1,6 @@
 import {StreamChat} from "stream-chat"
 import { ENV } from "./env.js"
+import { StreamClient } from "@stream-io/node-sdk"
 
 const apiKey = ENV.STREAM_API_KEY
 const apiSecret = ENV.STREAM_API_SECRET
@@ -9,7 +10,9 @@ if(!apiKey || !apiSecret){
     exit(1)
 }
 
-export const chatClient = StreamChat.getInstance(apiKey,apiSecret); //if connection is already made, then its fine else create a new one
+//this is for video calling
+export const streamClient = new StreamClient(apiKey,apiSecret)
+export const chatClient = StreamChat.getInstance(apiKey,apiSecret); //this is for chat messaging, if connection is already made, then its fine else create a new one
 
 export const upsertStreamUser = async(userData) =>{
     try {

@@ -8,7 +8,7 @@ import { functions, inngest } from "./lib/inngest.js";
 import {clerkMiddleware} from "@clerk/express"
 import { protectRoute } from "./middleware/protectRoute.js";
 import chatRoutes from "./routes/chatRoutes.js"
-
+import sessionRoute from "./routes/sessionRoute.js"
 const app= express()
 
 const __dirname = path.resolve() /* this maintains the right address for any OS
@@ -20,6 +20,8 @@ app.use(cors({
     origin: ENV.CLIENT_URL,
     credentials:true //allows cookies/tokens to enter or to come along with
 }))
+
+app.use("/api/sessions",sessionRoute)
 
 app.use(clerkMiddleware()) //this adds auth feild to request object: req.auth
 console.log(ENV.PORT)
