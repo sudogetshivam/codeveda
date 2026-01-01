@@ -11,7 +11,7 @@ export async function createSession(req,res){
            return res.status(400).json({message:"Problem and Difficulty are required"})
         }
         //generate unique call id
-        const callId = `session_${Date.now()}_${Math.random().toString(36).substring(7)}`
+        const callId = `session_${crypto.randomUUID()}`
 
         const session = await Session.create({problem,difficulty,host : hostId,callId})
 
