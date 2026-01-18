@@ -39,7 +39,6 @@ function App() {
 
   return (
     <>
-    <h1 className='text-red-500 bg-orange-400 p-10 text-3xl'>Welcome to talent IQ</h1>
       <Routes>
       <Route path="/" element = {<HomePage/>}></Route>
       <Route path="/problems" element = { isSignedIn ? <ProblemsPage/> : <Navigate to = {"/"}/>}/>
