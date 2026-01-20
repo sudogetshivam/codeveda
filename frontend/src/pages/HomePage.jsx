@@ -1,5 +1,5 @@
 import {Link} from "react-router"
-import {ArrowRightIcon, CheckIcon, SparklesIcon, VideoIcon, ZapIcon} from "lucide-react"
+import {ArrowRightIcon, CheckIcon, Code2, CodeIcon, SparklesIcon, UsersIcon, VideoIcon, ZapIcon} from "lucide-react"
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/clerk-react"
 function HomePage(){
     return (
@@ -9,7 +9,7 @@ function HomePage(){
         <div className="max-w-7xl mx-auto p-4 flex items-center justify-between">
         <Link to = {"/"} className="flex items-center gap-3 hover:scale-105 transition-transform duration-200">
         <div className="size-10 rounded-xl bg-gradient-to-br from-primary via-secondary to-accent flex items-center justify-center shadow-lg">
-            <SparklesIcon/>
+            <SparklesIcon className="text-white"/>
         </div>
         <div className="flex flex-col">
             <span className="font-black text-xl bg-gradient-to-tr from-primary via-seconday to-accent bg-clip-text text-transparent font-mono tracking-wider">
@@ -110,6 +110,58 @@ function HomePage(){
                 </div>
                 <img src="/image.png" alt="CodeCollab Platform" className="w-full h-auto rounded-3xl shadow-2xl border-4 border-base-100 hover:scale-105 transition-transform duration-500"/>
 
+            </div>
+        </div>
+        {/*Features section */}
+        <div className="max-w-7xl mx-auto px-4 py-20">
+            <div className="text-center mb-16">
+                <h2 className="text-4xl font-bold mb-4">
+                    Everything you need to know <span className="text-primary font-mono">Succed</span>
+                </h2>
+                <p className="text-lg text-base-content/70 max-w-2xl mx-auto">
+                Powerful features designed to make your coding interviews seamless and productive</p>
+            </div>
+            {/* Feature 1 */}
+            <div className="grid md:grid-cols-3 gap-8">
+                <div className="card bg-base-100 shadow-xl">
+                <div className="card-body items-center text-center">
+                    <div className="size-16 bg-primary/20 rounded-2xl flex items-center justify-center mb-4">
+                    <VideoIcon className="size-8 text-primary"/>
+                    </div>
+                    <h3 className="card-title">HD video call</h3>
+                    <p className="text-based-content/70">
+                    Crystal clear video and audio for seamless communication during interview
+                    </p>
+                    </div>
+
+                    
+                </div>
+                            {/* Feature 2 */}
+
+                      <div className="card bg-base-100 shadow-xl">
+                    <div className="card-body items-center text-center">
+                    <div className="size-16 bg-primary/20 rounded-2xl flex items-center justify-center mb-4">
+                    <CodeIcon className="size-8 text-primary"/>
+                    </div>
+                    <h3 className="card-title">Live Code Editor</h3>
+                    <p className="text-based-content/70">
+                    Collaborate in real-time with syntax highlighting and multiple language support
+                    </p>
+                    </div>
+                    </div>
+                    {/* Feature 3 */}
+                      <div className="card bg-base-100 shadow-xl">
+                    <div className="card-body items-center text-center">
+                    <div className="size-16 bg-primary/20 rounded-2xl flex items-center justify-center mb-4">
+                    <UsersIcon className="size-8 text-primary"/>
+                    </div>
+                    <h3 className="card-title">Easy Collabration</h3>
+                    <p className="text-based-content/70">
+                    Share your screen, discuss solutions, and learn from each-other in real time
+                    </p>
+                    </div>
+
+                    </div>
             </div>
         </div>
         </div>
