@@ -3,11 +3,16 @@ import { SignedIn, SignedOut, SignIn, SignInButton, SignOutButton, UserButton, u
 import {Navigate,Route, Routes } from "react-router"
 import HomePage from './pages/HomePage'
 import ProblemsPage from './pages/ProblemsPage'
+import Dashboard from './pages/Dashboard'
 import { Toaster } from 'react-hot-toast'
 
 function App() {
   const [count, setCount] = useState(0)
-    const{ isSignedIn } = useUser()
+    const{ isSignedIn,isLoaded } = useUser()
+
+    //this will get rid of flickering effect
+    if(!isLoaded) return null
+
     //? -> kaam ki baat
     /* Agar tum useEffect use karte ho, toh jab bhi tum ek page se dusre page par jaoge 
     aur wapas aaoge, wo phir se loading dikhayega aur data fetch karega. 
@@ -40,7 +45,8 @@ function App() {
   return (
     <>
       <Routes>
-      <Route path="/" element = {<HomePage/>}></Route>
+      <Route path="/" element = {!isSignedIn ? <HomePage/> : <Navigate to = {"/dashboard"}/>}></Route>
+      <Route path = "/dashboard" element = {isSignedIn ? <Dashboard/> : <Navigate to = {"/"}/>}/>
       <Route path="/problems" element = { isSignedIn ? <ProblemsPage/> : <Navigate to = {"/"}/>}/>
       </Routes>
      <Toaster position='top-right'/>
