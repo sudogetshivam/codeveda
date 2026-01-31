@@ -28,7 +28,7 @@ function Navbar() {
                 </div>
                 </div>
                 <div className="flex flex-col">
-                 <span className="font-black text-xl bg-gradient-to-tr from-primary via-seconday to-accent bg-clip-text text-transparent font-mono tracking-wider">
+                 <span className="font-black text-xl bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-mono tracking-wider">
                 <p>Talent IQ</p>
             </span>
             <span>
