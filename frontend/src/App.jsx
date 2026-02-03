@@ -3,6 +3,7 @@ import { SignedIn, SignedOut, SignIn, SignInButton, SignOutButton, UserButton, u
 import {Navigate,Route, Routes } from "react-router"
 import HomePage from './pages/HomePage'
 import ProblemsPage from './pages/ProblemsPage'
+import ProblemPage from './pages/ProblemPage'
 import Dashboard from './pages/Dashboard'
 import { Toaster } from 'react-hot-toast'
 
@@ -48,6 +49,7 @@ function App() {
       <Route path="/" element = {!isSignedIn ? <HomePage/> : <Navigate to = {"/dashboard"}/>}></Route>
       <Route path = "/dashboard" element = {isSignedIn ? <Dashboard/> : <Navigate to = {"/"}/>}/>
       <Route path="/problems" element = { isSignedIn ? <ProblemsPage/> : <Navigate to = {"/"}/>}/>
+      <Route path="/problems/problem/:id" element = { isSignedIn ? <ProblemPage/> : <Navigate to = {"/"}/>}/>
       </Routes>
      <Toaster position='top-right'/>
     </>

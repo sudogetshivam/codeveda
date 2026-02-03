@@ -1,0 +1,24 @@
+.split {
+    display: flex;
+}
+
+.gutter {
+    background-color: #2a2a2a;
+    background-repeat: no-repeat;
+    background-position: 50%;
+    transition: background-color 0.3s;
+}
+
+.gutter:hover {
+    background-color: #374151;
+}
+
+.gutter.gutter-horizontal {
+    cursor: col-resize;
+    width: 8px;
+}
+
+.gutter.gutter-vertical {
+    cursor: row-resize;
+    height: 8px;
+}
