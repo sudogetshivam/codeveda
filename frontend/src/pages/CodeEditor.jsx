@@ -40,7 +40,7 @@ key = javascript , lang = {name : "Javascript"}
                 */}
         </div>
 
-        <button className='btn btn-primary btn-sm gap-2' disabled = {isRunning} onClick={onRunCode}>
+        <button className='btn btn-primary btn-sm gap-2' disabled = {isRunning} onClick={onRunCode}> Run
         {isRunning? (
           <>
           <Loader2Icon className='size-4 animate-spin'/>
@@ -60,7 +60,7 @@ key = javascript , lang = {name : "Javascript"}
         height={"100%"}
         language={LANGUAGE_CONFIG[selectedLanguage].monacoLang}
         value={code}
-        onChange={onCodeChange}
+        onChange={(value) => onCodeChange(value ?? "")}
         theme='vs-dark'
         options={{
           fontSize:16,
