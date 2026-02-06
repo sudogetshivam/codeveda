@@ -25,7 +25,7 @@ function CreateSessionModal({isOpen, onClose, roomConfig, setRoomConfig, onCreat
                             problem: e.target.value
                         })
                     }}>
-                        <option value="" disabled>Choose a coding problem...</option>
+                        <option value="" disabled>Choose a Problem</option>
                         {
                             problems.map((problem) =>(
                                 <option key= {problem.id} value={problem.title}>
