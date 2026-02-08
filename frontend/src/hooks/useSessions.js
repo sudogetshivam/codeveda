@@ -1,16 +1,21 @@
-import {useMutation,useQuery} from "@tanstack/react-query"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import toast from "react-hot-toast"
+import { useAuth } from "@clerk/clerk-react"
+import { getAuthToken } from "../lib/authToken"
 import { sessionApi } from "../api/sessions"
 
-export const useCreateSession = ()=>{
+export const useCreateSession = () => {
+    const { getToken } = useAuth()
     const result = useMutation({
         mutationKey: ["createSession"],
-        mutationFn: sessionApi.createSession,
-        onSuccess :  () => toast.success("Session created sucessfully"),
-        onError: (error) =>  toast.error(error.response?.data?.message || "Failed to create Session"),
-        
+        mutationFn: async (data) => {
+            const token = (await getToken?.()) ?? (await getAuthToken())
+            if (!token) throw new Error("Not signed in. Please refresh and try again.")
+            return sessionApi.createSession(data, token)
+        },
+        onSuccess: () => toast.success("Session created sucessfully"),
+        onError: (error) => toast.error(error.response?.data?.message || "Failed to create Session"),
     })
-
     return result
 }
 

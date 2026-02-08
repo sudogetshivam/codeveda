@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { SignedIn, SignedOut, SignIn, SignInButton, SignOutButton, UserButton, useUser } from '@clerk/clerk-react'
+import { useState, useEffect } from 'react'
+import { SignedIn, SignedOut, SignIn, SignInButton, SignOutButton, UserButton, useUser, useAuth } from '@clerk/clerk-react'
+import { setAuthGetToken } from './lib/authToken'
 import {Navigate,Route, Routes } from "react-router"
 import HomePage from './pages/HomePage'
 import ProblemsPage from './pages/ProblemsPage'
@@ -9,7 +10,13 @@ import { Toaster } from 'react-hot-toast'
 
 function App() {
   const [count, setCount] = useState(0)
-    const{ isSignedIn,isLoaded } = useUser()
+  const { isSignedIn, isLoaded } = useUser()
+  const { getToken } = useAuth()
+
+  useEffect(() => {
+    setAuthGetToken(getToken || null)
+    return () => setAuthGetToken(null)
+  }, [getToken])
 
     //this will get rid of flickering effect
     if(!isLoaded) return null

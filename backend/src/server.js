@@ -29,6 +29,21 @@ app.get('/',(req,res)=>{
    return res.status(200).json({msg:"sucess from api"})
 })
 
+if (!ENV.CLERK_SECRET_KEY) console.warn("CLERK_SECRET_KEY is missing in .env – auth will return 401")
+// Pass secret key so Clerk can verify JWTs (required when token is sent in Authorization header)
+app.use(clerkMiddleware({
+  secretKey: ENV.CLERK_SECRET_KEY,
+  publishableKey: ENV.CLERK_PUBLISHABLE_KEY,
+})) // adds auth to request: req.auth
+app.use("/api/sessions", sessionRoute)
+
+// Debug: check if backend receives auth (remove or protect in production)
+app.get("/api/auth/check", (req, res) => {
+  const hasHeader = !!req.headers.authorization
+  const userId = req.auth?.userId ?? null
+  res.json({ hasAuthHeader: hasHeader, userId, hint: hasHeader && !userId ? "Token invalid or wrong CLERK_SECRET_KEY" : null })
+})
+
 app.use('/api/inngest',protectRoute,serve({client:inngest, functions}))
 app.use("/api/chat",chatRoutes)
 
