@@ -1,19 +1,33 @@
 import Session from "../models/Session.js"
 import { chatClient, streamClient } from "../lib/streams.js"
 
-export async function createSession(req,res){
-     try {
-        const {problem, difficulty} = req.body
-        const hostId = req.user._id
-        const clerkId = req.user.clerkId
-   
-        if(!problem || !difficulty){
-           return res.status(400).json({message:"Problem and Difficulty are required"})
-        }
+// Session model enum expects "Easy" | "Medium" | "Hard" (capitalized)
+function normalizeDifficulty(d) {
+  if (!d || typeof d !== "string") return d;
+  const lower = d.toLowerCase();
+  return lower.charAt(0).toUpperCase() + lower.slice(1);
+}
+
+export async function createSession(req, res) {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: "Authentication required" });
+    }
+    const { problem, difficulty: rawDifficulty } = req.body;
+    const difficulty = normalizeDifficulty(rawDifficulty);
+    const userId = req.user._id;
+    const clerkId = req.user.clerkId;
+
+    if (!problem || !difficulty) {
+      return res.status(400).json({ message: "Problem and difficulty are required" });
+    }
+    if (!["Easy", "Medium", "Hard"].includes(difficulty)) {
+      return res.status(400).json({ message: "Difficulty must be Easy, Medium, or Hard" });
+    }
         //generate unique call id
         const callId = `session_${crypto.randomUUID()}`
 
-        const session = await Session.create({problem,difficulty,host : hostId,callId})
+        const session = await Session.create({problem,difficulty,host : userId,callId})
 
       //create stream video call
       await streamClient.video.call("default",callId).getOrCreate({
@@ -38,8 +52,9 @@ export async function createSession(req,res){
 
       res.status(201).json({session})
      } catch (error) {  
-        console.log("createSession controller faiied: ",error.message)
-        return res.status(500).json({message: "Internal server error"})
+        console.error("Error in createSession controller:", error);
+    const message = error.message || "Internal Server Error";
+    res.status(500).json({ message });
      }
 
 }
@@ -47,8 +62,8 @@ export async function createSession(req,res){
 export async function getActiveSessions(req,res){ // here req is not being used you can put underscore there
 
    try {
-       const sessions =await  Session.find({status:"active"}).populate("host","name profileImage email clerkId").
- // look for now it is only checking active sessions, what if any session is not active, think about that scenario also
+       const sessions =await  Session.find({status:"active"}).populate("host","name profileImage email clerkId").populate("host","name profileImage email clerkId"). // look for now it is only checking active sessions, what if any session is not active, think about that scenario also
+
        sort({createdAt:-1}).limit(20)
 
        res.status(200).json({sessions})
@@ -59,6 +74,10 @@ export async function getActiveSessions(req,res){ // here req is not being used 
 }
 
 export async function getMyRecentSessions(req,res){
+
+   if (!req.user) {
+      return res.status(401).json({ message: "Authentication required in getMYSessioncontroller" });
+    }
 
    try {
       const userId =   req.user._id

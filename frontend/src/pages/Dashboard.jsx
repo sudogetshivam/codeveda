@@ -9,6 +9,7 @@ import ActiveSession from './ActiveSession';
 import CreateSessionModal from './CreateSessionModal';
 import RecentSessions from './RecentSessions';
 import StatsCards from './StatsCards';
+import sesssion from '../../../backend/src/models/Session';
 
 function Dashboard(){
     const navigate = useNavigate();
@@ -41,6 +42,13 @@ function Dashboard(){
     const activeSessions = activeSessionData?.sessions || []
     const recentSessions = recentSessionsData?.session || []
 
+    const isUserInSession = (session) => {
+        if(!user.id) return false;
+
+        return session.host?.clerkId === user.id || session.participant?.clerkId === user.id
+        //if any of these is true then user is part of the session
+    }
+
     useCreateSession
     return(
         <>
@@ -50,10 +58,19 @@ function Dashboard(){
             {/* Grid Layout */}
             <div className='container mx-auto px-6 pb-16'>
                 <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
-                    <StatsCards/>
-                    <ActiveSession/>
+                    <StatsCards
+                    activeSessionsCount = {activeSessions.length}
+                    recentSessionsCount = {recentSessions.length}
+                        />
+                    <ActiveSession
+                    sessions = {activeSessions}
+                    isLoading = {loadingActiveSessions}
+                    isUserInSession = {isUserInSession}
+                    />
                 </div>
-                <RecentSessions/>
+                <RecentSessions
+                sessions = {recentSessions}
+                isLoading = {loadingRecentSessions}/>
             </div>
         </div>
 

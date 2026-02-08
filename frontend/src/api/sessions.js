@@ -1,8 +1,9 @@
 import axiosInstance from '../lib/axios';
 
 export const sessionApi = {
-    createSession : async (data) => {
-        const response = await axiosInstance.post("/sessions",data)
+    createSession : async (data, token) => {
+        const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
+        const response = await axiosInstance.post("/sessions", data, config);
         return response.data
     },
 

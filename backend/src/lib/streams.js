@@ -7,7 +7,7 @@ const apiSecret = ENV.STREAM_API_SECRET
 
 if(!apiKey || !apiSecret){
     console.error("Stream API Key or Stream Secret is missing")
-    exit(1)
+    process.exit(1)
 }
 
 //this is for video calling
