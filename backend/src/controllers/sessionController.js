@@ -50,7 +50,7 @@ export async function createSession(req, res) {
 
       await channel.create()
 
-      res.status(201).json({session})
+      res.status(201).json({session}) //bina curly braces ke list type main jata [ { }, { } ], with curly braces main jata {session: { [], [] }}
      } catch (error) {  
         console.error("Error in createSession controller:", error);
     const message = error.message || "Internal Server Error";
@@ -144,7 +144,7 @@ export async function joinSession(req,res){
 
       Multiple log? Bas comma laga ke aur ID daal do [id1, id2, id3].
 
-      Kaam kya hai? User ko us specific room ka Official Member banana taaki wo chat/call kar paye. ✅
+      Kaam kya hai? User ko us specific room ka Official Member banana taaki wo chat/call kar paye. 
 
        */
    return res.status(200).json({session,message:"Joined session successfully"})
