@@ -11,7 +11,7 @@ import {getDifficultyBadgeClass} from '../lib/utils';
 import { Loader2Icon, LogOutIcon, PhoneOffIcon } from 'lucide-react';
 import CodeEditor from './CodeEditor';
 import OutputPanel from './OutputPanel';
-import VideoCallUI from './VideoCallUI ';
+import VideoCallUI from './VideoCallUI';
 
 
 import useStreamClient from '../hooks/useStreamClient';

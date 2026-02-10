@@ -92,7 +92,7 @@ function VideoCallUI ({chatClient, channel}) {
                     <Thread />
                   </Channel>
                 </Chat>
-              </div>``
+              </div>
                 </>
 
             )}
