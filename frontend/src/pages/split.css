@@ -22,3 +22,19 @@
     cursor: row-resize;
     height: 8px;
 }
+
+/* Vertical gutter (jo tere case mein missing hai) */
+.gutter.gutter-vertical {
+    background-color: #334155; /* Slate-700 color ya apni theme ke hisaab se */
+    cursor: row-resize;
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzy7zhAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+/* Gutter ki thickness */
+.gutter {
+    background-color: #1e293b; /* Darker bg */
+    background-repeat: no-repeat;
+    background-position: 50%;
+}

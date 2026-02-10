@@ -98,7 +98,7 @@ export async function getMyRecentSessions(req,res){
 export async function getSessionById(req,res){
 try {
    const {id} = req.params // jo router main pass kiye ho variable wahi karna hain, sessionRoute.get("/:id",protectRoute,getSessionById
-   
+   console.log("Session ID from params: ", id)
    
    /*
    OLD SCHOOL WAY
@@ -176,7 +176,7 @@ export async function endSession(req,res){
       //now delete video call
 
       //first grab the videocall by id
-      const call = chatClient.channel("default",session.callId);
+      const call = streamClient.video.call("default",session.callId);
       await call.delete({hard:true})
 
       //now delete chat

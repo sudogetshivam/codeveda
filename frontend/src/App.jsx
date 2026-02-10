@@ -1,12 +1,13 @@
-import { useState, useEffect } from 'react'
-import { SignedIn, SignedOut, SignIn, SignInButton, SignOutButton, UserButton, useUser, useAuth } from '@clerk/clerk-react'
-import { setAuthGetToken } from './lib/authToken'
-import {Navigate,Route, Routes } from "react-router"
-import HomePage from './pages/HomePage'
-import ProblemsPage from './pages/ProblemsPage'
-import ProblemPage from './pages/ProblemPage'
-import Dashboard from './pages/Dashboard'
+import { useAuth, useUser } from '@clerk/clerk-react'
+import { useEffect, useState } from 'react'
 import { Toaster } from 'react-hot-toast'
+import { Navigate, Route, Routes } from "react-router"
+import { setAuthGetToken } from './lib/authToken'
+import Dashboard from './pages/Dashboard'
+import HomePage from './pages/HomePage'
+import ProblemPage from './pages/ProblemPage'
+import ProblemsPage from './pages/ProblemsPage'
+import SessionPage from './pages/SessionPage'
 
 function App() {
   const [count, setCount] = useState(0)
@@ -52,11 +53,13 @@ function App() {
 
   return (
     <>
+      
       <Routes>
       <Route path="/" element = {!isSignedIn ? <HomePage/> : <Navigate to = {"/dashboard"}/>}></Route>
       <Route path = "/dashboard" element = {isSignedIn ? <Dashboard/> : <Navigate to = {"/"}/>}/>
       <Route path="/problems" element = { isSignedIn ? <ProblemsPage/> : <Navigate to = {"/"}/>}/>
       <Route path="/problems/problem/:id" element = { isSignedIn ? <ProblemPage/> : <Navigate to = {"/"}/>}/>
+      <Route path = "/session/:id" element = {isSignedIn ? <SessionPage/> : <Navigate to = {"/"}/>}></Route>
       </Routes>
      <Toaster position='top-right'/>
     </>
