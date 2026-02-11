@@ -52,44 +52,55 @@ app.get('/books',protectRoute,(req,res)=>{
    return res.status(200).json({msg:"This is the books endpoint"})
 })
 
-
-if(ENV.NODE_ENV === "production"){
-    app.use(express.static(path.join(__dirname,"../frontend/dist")))
-    /* app.use() is the security gaurd if any request even a get request it will go though app.use 
-    for example app.use(express.json()) -> checks the request has json data or not, so in this case
-    if anything is present in frontend/dist static files like logo.png, style.css without even single thought
-    give those requests answers, dont go to app.get 
+// if(ENV.NODE_ENV === "production"){
+//     app.use(express.static(path.join(__dirname,"../frontend/dist")))
+//     /* app.use() is the security gaurd if any request even a get request it will go though app.use 
+//     for example app.use(express.json()) -> checks the request has json data or not, so in this case
+//     if anything is present in frontend/dist static files like logo.png, style.css without even single thought
+//     give those requests answers, dont go to app.get 
     
-    and this express.static is also a function something like this
+//     and this express.static is also a function something like this
     
-    // Aisa code Express ke andar likha hua hai
-function static(folderName) {
+//     // Aisa code Express ke andar likha hua hai
+// function static(folderName) {
     
-    // Ye function return karta hai ek naya function (Middleware)
-    // Jisme req, res, next hote hain!
-    return function(req, res, next) {
+//     // Ye function return karta hai ek naya function (Middleware)
+//     // Jisme req, res, next hote hain!
+//     return function(req, res, next) {
         
-        const fileName = req.url; // e.g., "/style.css"
-        const filePath = path.join(folderName, fileName);
+//         const fileName = req.url; // e.g., "/style.css"
+//         const filePath = path.join(folderName, fileName);
 
-        // 1. Check karta hai file hai ya nahi
-        if (fileExists(filePath)) {
-            // 2. Agar hai, toh bhej do (req, res yahan use hue!)
-            res.sendFile(filePath);
-        } else {
-            // 3. Agar nahi hai, toh aage badho
-            next();
-        }
-    };
-}
-    }*/
+//         // 1. Check karta hai file hai ya nahi
+//         if (fileExists(filePath)) {
+//             // 2. Agar hai, toh bhej do (req, res yahan use hue!)
+//             res.sendFile(filePath);
+//         } else {
+//             // 3. Agar nahi hai, toh aage badho
+//             next();
+//         }
+//     };
+// }
+//     }*/
 
-app.get('*',(req,res)=>{
-    return(
-        res.sendFile(path.join(__dirname,"../frontend","dist","index.html"))
-    )
-})
+// app.get('*',(req,res)=>{
+//     return(
+//         res.sendFile(path.join(__dirname,"../frontend","dist","index.html"))
+//     )
+// })
+// }
+
+if (process.env.NODE_ENV === "production") {
+
+    app.use(express.static(path.join(__dirname,"../frontend/dist")))
+
+    app.get("*", (req,res)=>{
+        res.sendFile(
+            path.join(__dirname,"../frontend/dist/index.html")
+        )
+    })
 }
+
 
 const startServer = async()=>{
     try{
