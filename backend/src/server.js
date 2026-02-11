@@ -84,7 +84,7 @@ function static(folderName) {
 }
     }*/
 
-app.get('/{*any}',(req,res)=>{
+app.get('*',(req,res)=>{
     return(
         res.sendFile(path.join(__dirname,"../frontend","dist","index.html"))
     )
