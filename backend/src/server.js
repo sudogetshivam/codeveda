@@ -54,7 +54,7 @@ app.get('/books',protectRoute,(req,res)=>{
 
 
 if(ENV.NODE_ENV === "production"){
-    app.use(express.static(path.join(__dirname,"../frontend/dist")))
+  app.use(express.static(path.join(__dirname, "../frontend/dist")));
     /* app.use() is the security gaurd if any request even a get request it will go though app.use 
     for example app.use(express.json()) -> checks the request has json data or not, so in this case
     if anything is present in frontend/dist static files like logo.png, style.css without even single thought
@@ -84,11 +84,12 @@ function static(folderName) {
 }
     }*/
 
-app.get('/{*any}',(req,res)=>{
-    return(
-        res.sendFile(path.join(__dirname,"../frontend","dist","index.html"))
-    )
-})
+app.use((req, res) => {
+  res.sendFile(
+    path.join(__dirname, "../frontend/dist/index.html")
+  );
+});
+
 }
 
 const startServer = async()=>{
