@@ -13,10 +13,10 @@ function HomePage(){
         </div>
         <div className="flex flex-col">
             <span className="font-black text-xl bg-gradient-to-tr from-primary via-seconday to-accent bg-clip-text text-transparent font-mono tracking-wider">
-                <p>Talent IQ</p>
+                <p>CodeVeda</p>
             </span>
             <span>
-                <p className="text-xs text-white/40 ">Code Together</p>
+                <p className="text-xs text-white/40 ">Optimal Logic. Timeless Wisdom.</p>
             </span>
 
         </div>
@@ -84,12 +84,12 @@ function HomePage(){
                                 </span>
                             </button>
                         </SignInButton>
-                        <div>
+                        {/* <div>
                         <button className="btn btn-outline btn-lg">
                             <VideoIcon className="size-5"/>
                             Watch Demo
                         </button>
-                    </div>
+                    </div> */}
                     </div>
                     <div className="stats stats-vertical lg:stats-horizontal bg-base-100 shadow-lg">
                         <div className="stat">

@@ -1,5 +1,5 @@
 import {Link, useLocation} from "react-router"
-import {ArrowRightIcon, BookOpenIcon, CheckIcon, Code2, CodeIcon, LayoutDashboardIcon, SparklesIcon, UsersIcon, VideoIcon, ZapIcon} from "lucide-react"
+import {ArrowRightIcon, BookOpenIcon,Library, CheckIcon, Code2, CodeIcon, LayoutDashboardIcon, SparklesIcon, UsersIcon, VideoIcon, ZapIcon} from "lucide-react"
 import { UserButton } from "@clerk/clerk-react"
 
 
@@ -24,15 +24,15 @@ function Navbar() {
             >
                 <div className="size-10 rounded-xl bg-gradient-to-r from-primary via-secondary to-accent flex items-center justify-center shadow-lg">
                 <div>
-                    <SparklesIcon className="size-6 text-white"></SparklesIcon>
+                    <Library className="size-6 text-white"/>
                 </div>
                 </div>
                 <div className="flex flex-col">
-                 <span className="font-black text-xl bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-mono tracking-wider">
-                <p>Talent IQ</p>
+                 <span className="font-black text-xl bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent font-mono">
+                <p>CodeVeda</p>
             </span>
             <span>
-                <p className="text-xs text-white/40 ">Code Together</p>
+                <p className="text-xs text-white/40 ">Optimal Logic.Timeless Wisdom.</p>
             </span>
                 </div>
             </Link>
