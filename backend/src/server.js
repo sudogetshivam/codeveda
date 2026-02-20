@@ -3,13 +3,14 @@ import path from "path";
 import { ENV } from "./lib/env.js"
 import { connectDB } from "./lib/db.js";
 import cors from "cors"
-import {serve} from "inngest/express"
+import { serve } from "inngest/express"
 import { functions, inngest } from "./lib/inngest.js";
-import {clerkMiddleware} from "@clerk/express"
+import { clerkMiddleware } from "@clerk/express"
 import { protectRoute } from "./middleware/protectRoute.js";
 import chatRoutes from "./routes/chatRoutes.js"
 import sessionRoute from "./routes/sessionRoute.js"
-const app= express()
+import executionRoute from "./routes/executionRoute.js"
+const app = express()
 
 const __dirname = path.resolve() /* this maintains the right address for any OS
 and dirname name is used to store the absolute path, deosnt matter from where you run the server, this si just a standarad variables */
@@ -17,16 +18,16 @@ and dirname name is used to store the absolute path, deosnt matter from where yo
 
 app.use(express.json()) //converts coming json data to Javascript Object so that we can read in req.bodt
 app.use(cors({
-    origin: [ENV.CLIENT_URL,"http://localhost:5173"],
-    credentials:true //allows cookies/tokens to enter or to come along with
+  origin: [ENV.CLIENT_URL, "http://localhost:5173"],
+  credentials: true //allows cookies/tokens to enter or to come along with
 }))
 
-app.use("/api/sessions",sessionRoute)
+app.use("/api/sessions", sessionRoute)
 
 app.use(clerkMiddleware()) //this adds auth feild to request object: req.auth
 console.log(ENV.PORT)
-app.get('/',(req,res)=>{
-   return res.status(200).json({msg:"sucess from api"})
+app.get('/', (req, res) => {
+  return res.status(200).json({ msg: "sucess from api" })
 })
 
 if (!ENV.CLERK_SECRET_KEY) console.warn("CLERK_SECRET_KEY is missing in .env – auth will return 401")
@@ -44,63 +45,64 @@ app.get("/api/auth/check", (req, res) => {
   res.json({ hasAuthHeader: hasHeader, userId, hint: hasHeader && !userId ? "Token invalid or wrong CLERK_SECRET_KEY" : null })
 })
 
-app.use('/api/inngest',protectRoute,serve({client:inngest, functions}))
-app.use("/api/chat",chatRoutes)
+app.use('/api/inngest', protectRoute, serve({ client: inngest, functions }))
+app.use("/api/execute", executionRoute)
+app.use("/api/chat", chatRoutes)
 
 //as protect route is an array so waht express does is, when you pass an array of middleware to express, it automatically flattens and executes them sequentially one by one
-app.get('/books',protectRoute,(req,res)=>{
-   return res.status(200).json({msg:"This is the books endpoint"})
+app.get('/books', protectRoute, (req, res) => {
+  return res.status(200).json({ msg: "This is the books endpoint" })
 })
 
 
-if(ENV.NODE_ENV === "production"){
+if (ENV.NODE_ENV === "production") {
   app.use(express.static(path.join(__dirname, "../frontend/dist")));
-    /* app.use() is the security gaurd if any request even a get request it will go though app.use 
-    for example app.use(express.json()) -> checks the request has json data or not, so in this case
-    if anything is present in frontend/dist static files like logo.png, style.css without even single thought
-    give those requests answers, dont go to app.get 
-    
-    and this express.static is also a function something like this
-    
-    // Aisa code Express ke andar likha hua hai
+  /* app.use() is the security gaurd if any request even a get request it will go though app.use 
+  for example app.use(express.json()) -> checks the request has json data or not, so in this case
+  if anything is present in frontend/dist static files like logo.png, style.css without even single thought
+  give those requests answers, dont go to app.get 
+  
+  and this express.static is also a function something like this
+  
+  // Aisa code Express ke andar likha hua hai
 function static(folderName) {
-    
-    // Ye function return karta hai ek naya function (Middleware)
-    // Jisme req, res, next hote hain!
-    return function(req, res, next) {
-        
-        const fileName = req.url; // e.g., "/style.css"
-        const filePath = path.join(folderName, fileName);
+  
+  // Ye function return karta hai ek naya function (Middleware)
+  // Jisme req, res, next hote hain!
+  return function(req, res, next) {
+      
+      const fileName = req.url; // e.g., "/style.css"
+      const filePath = path.join(folderName, fileName);
 
-        // 1. Check karta hai file hai ya nahi
-        if (fileExists(filePath)) {
-            // 2. Agar hai, toh bhej do (req, res yahan use hue!)
-            res.sendFile(filePath);
-        } else {
-            // 3. Agar nahi hai, toh aage badho
-            next();
-        }
-    };
+      // 1. Check karta hai file hai ya nahi
+      if (fileExists(filePath)) {
+          // 2. Agar hai, toh bhej do (req, res yahan use hue!)
+          res.sendFile(filePath);
+      } else {
+          // 3. Agar nahi hai, toh aage badho
+          next();
+      }
+  };
 }
-    }*/
+  }*/
 
-app.use((req, res) => {
-  res.sendFile(
-    path.join(__dirname, "../frontend/dist/index.html")
-  );
-});
+  app.use((req, res) => {
+    res.sendFile(
+      path.join(__dirname, "../frontend/dist/index.html")
+    );
+  });
 
 }
 
-const startServer = async()=>{
-    try{
+const startServer = async () => {
+  try {
     await connectDB() //if u remove await then also it will work but buttom code will execute first
-    app.listen(3000,()=>
-        console.log(`Server is running at ${'https://talentiq-puhr.onrender.com'}`)
+    app.listen(3000, () =>
+      console.log(`Server is running at ${'https://talentiq-puhr.onrender.com'}`)
     )
-    } catch(error){
-        console.log("Error starting the server",error)
-    }
+  } catch (error) {
+    console.log("Error starting the server", error)
+  }
 }
 
 startServer()

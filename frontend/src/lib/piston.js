@@ -1,11 +1,11 @@
 import { Languages } from "lucide-react"
+import axiosInstance from "./axios.js"
 
-const PISTON_API = "https://emkc.org/api/v2/piston"
-
+// The backend handles the translation to JDoodle's expected format.
 const LANGUAGE_VERSION = {
-    javascript: {language:"javascript",version:"18.15.0"},
-    python: {language:"python",version:"3.10.0"},
-    java: {language:"java",version:"15.0.2"}
+    javascript: { language: "javascript", version: "18.15.0" },
+    python: { language: "python", version: "3.10.0" },
+    java: { language: "java", version: "15.0.2" }
 }
 
 /**
@@ -15,69 +15,48 @@ const LANGUAGE_VERSION = {
  */
 
 
-function getExtensionName(language){
+function getExtensionName(language) {
     const extensions = {
-        javascript:"js",
-        python:"py",
-        java:"java"
+        javascript: "js",
+        python: "py",
+        java: "java"
     }
     return extensions[language] || "txt"
 }
 
-export async function executeCode(language,code){
+export async function executeCode(language, code) {
     try {
         const languageconfig = LANGUAGE_VERSION[language]
-        if(!languageconfig){
+        if (!languageconfig) {
             return {
-                success : false,
+                success: false,
                 error: `Unsupported Language : ${language}`
             }
         }
 
-        const response = await fetch(`${PISTON_API}/execute`,{
-            method:"POST",
-            headers: {
-                "Content-Type":"application/json"
-            },
-            body : JSON.stringify({
-                language: languageconfig.language,
-                version : languageconfig.version,
-                files:[
-                {
-                    name:`main.${getExtensionName(language)}`,
-                    content: code,
+        // Use axiosInstance which has baseURL configured (e.g., http://localhost:3000/api)
+        // So we just need to hit "/execute" endpoint
+        const response = await axiosInstance.post("/execute", {
+            language: language,
+            code: code
+        });
 
-                },
-                ],
-            })
-        }); 
+        const data = response.data;
 
-        if(!response.ok){
-            return {
-                success : false,
-                error: `HTTP error status: ${response.status}`
-            }
-        }
-
-        const data = await response.json()
-        const output = data.run.output || ""
-        const stderr  =data.run.stderr || ""
-
-        if(stderr){
-            return {
-                success : false,
-                output: output,
-                error: stderr
-            }
-        }
-
-        return {success: true, output:output || "No output"}
-    } catch (error) {
+        // Backend response format: { success: true, output: "..." }
         return {
-            success : false,
-            error: `Failed to execute code: ${error.message}`
+            success: true,
+            output: data.output || "No output"
         }
-        
+
+    } catch (error) {
+        // Axios error handling
+        const message = error.response?.data?.error || error.message || "Failed to execute code";
+        return {
+            success: false,
+            error: message
+        }
+
     }
 
 }
