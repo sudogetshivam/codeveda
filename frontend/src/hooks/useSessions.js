@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import toast from "react-hot-toast"
 import { useAuth } from "@clerk/clerk-react"
 import { getAuthToken } from "../lib/authToken"
@@ -21,7 +21,7 @@ export const useCreateSession = () => {
 
 export const useActiveSessions = () => {
     const result = useQuery({
-        queryKey:["activeSessions"],
+        queryKey: ["activeSessions"],
         queryFn: sessionApi.getActiveSessions
     })
     return result
@@ -29,8 +29,8 @@ export const useActiveSessions = () => {
 
 export const useMyRecentSessions = () => {
     const result = useQuery({
-        queryKey:["myRecentSessions"],
-        queryFn:sessionApi.getMyRecentSessions
+        queryKey: ["myRecentSessions"],
+        queryFn: sessionApi.getMyRecentSessions
     })
 
     return result
@@ -38,32 +38,49 @@ export const useMyRecentSessions = () => {
 
 export const useSessionById = (id) => {
     const result = useQuery({
-        queryKey:["session",id],
-        queryFn:() => sessionApi.getSessionById(id),
+        queryKey: ["session", id],
+        queryFn: () => sessionApi.getSessionById(id),
         enabled: !!id,//also called bang bang operator, converts to boolean expression
-        refetchInterval:5000, // refetch every 5 seconds 
+        refetchInterval: 5000, // refetch every 5 seconds 
     })
 
     return result
 }
 
-export const useJoinSession = () =>{
+export const useJoinSession = () => {
     return useMutation({
         mutationKey: ["joinSession"],
-        mutationFn:sessionApi.joinSession,
-        onSuccess: () =>toast.success("User Joined Successfully"),
-        onError: (error) =>toast.error(error.response?.data?.message || "User Failed to join Session"),
+        mutationFn: sessionApi.joinSession,
+        onSuccess: () => toast.success("User Joined Successfully"),
+        onError: (error) => toast.error(error.response?.data?.message || "User Failed to join Session"),
     })
 }
 
-export const useEndSession = () =>{
+export const useEndSession = () => {
     const result = useMutation({
         mutationKey: ["endSession"],
-        mutationFn:sessionApi.endSession,
-        onSuccess: () =>toast.success("Session ended Successfully"),
-        onError: (error) =>toast.error(error.response?.data?.message || "Failed to end Session"),
+        mutationFn: sessionApi.endSession,
+        onSuccess: () => toast.success("Session ended Successfully"),
+        onError: (error) => toast.error(error.response?.data?.message || "Failed to end Session"),
     })
     return result
+}
+
+export const useLeaveSession = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationKey: ["leaveSession"],
+        mutationFn: sessionApi.leaveSession,
+        onSuccess: () => {
+            toast.success("Left Session Successfully");
+            queryClient.invalidateQueries(["activeSessions"]);
+            queryClient.invalidateQueries(["session"]);
+        },
+        onError: (error) => {
+            // Should not toast error on leave usually, as it might happen on navigating away
+            console.error("Failed to leave session:", error)
+        },
+    })
 }
 
 

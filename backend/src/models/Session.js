@@ -29,7 +29,13 @@ const sessionSchema = new mongoose.Schema({
     callId: {
         type:"String",
         default:""
-    }
+    },
+    roomKey:{
+        type:String,
+        required:true,
+        unique:true,
+        length:8,
+    },
 },{timestamps:true})
 
 const sesssion = mongoose.model("Session",sessionSchema)

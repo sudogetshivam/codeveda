@@ -3,138 +3,156 @@ import { chatClient, streamClient } from "../lib/streams.js"
 
 // Session model enum expects "Easy" | "Medium" | "Hard" (capitalized)
 function normalizeDifficulty(d) {
-  if (!d || typeof d !== "string") return d;
-  const lower = d.toLowerCase();
-  return lower.charAt(0).toUpperCase() + lower.slice(1);
+   if (!d || typeof d !== "string") return d;
+   const lower = d.toLowerCase();
+   return lower.charAt(0).toUpperCase() + lower.slice(1);
 }
 
 export async function createSession(req, res) {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ message: "Authentication required" });
-    }
-    const { problem, difficulty: rawDifficulty } = req.body;
-    const difficulty = normalizeDifficulty(rawDifficulty);
-    const userId = req.user._id;
-    const clerkId = req.user.clerkId;
+   try {
+      if (!req.user) {
+         return res.status(401).json({ message: "Authentication required" });
+      }
+      const { problem, difficulty: rawDifficulty } = req.body;
+      const difficulty = normalizeDifficulty(rawDifficulty);
+      const userId = req.user._id;
+      const clerkId = req.user.clerkId;
 
-    if (!problem || !difficulty) {
-      return res.status(400).json({ message: "Problem and difficulty are required" });
-    }
-    if (!["Easy", "Medium", "Hard"].includes(difficulty)) {
-      return res.status(400).json({ message: "Difficulty must be Easy, Medium, or Hard" });
-    }
-        //generate unique call id
-        const callId = `session_${crypto.randomUUID()}`
+      if (!problem || !difficulty) {
+         return res.status(400).json({ message: "Problem and difficulty are required" });
+      }
+      if (!["Easy", "Medium", "Hard"].includes(difficulty)) {
+         return res.status(400).json({ message: "Difficulty must be Easy, Medium, or Hard" });
+      }
+      //generate unique call id
+      const callId = `session_${crypto.randomUUID()}`
+      const roomKey = Math.floor(10000000 + Math.random() * 90000000).toString()
 
-        const session = await Session.create({problem,difficulty,host : userId,callId})
+      const session = await Session.create({ problem, difficulty, host: userId, callId, roomKey })
 
       //create stream video call
-      await streamClient.video.call("default",callId).getOrCreate({
-         data:{
-            created_by_id:clerkId,
-            custom:{
+      await streamClient.video.call("default", callId).getOrCreate({
+         data: {
+            created_by_id: clerkId,
+            custom: {
                problem,
                difficulty,
-               sessionId:session._id.toString()
+               sessionId: session._id.toString()
             }
          }
       })
 
       //create chat
-      const channel = chatClient.channel("messaging",callId,{
-         name:`${problem} session`,
+      const channel = chatClient.channel("messaging", callId, {
+         name: `${problem} session`,
          created_by_id: clerkId,
          members: [clerkId]
       })
 
       await channel.create()
 
-      res.status(201).json({session}) //bina curly braces ke list type main jata [ { }, { } ], with curly braces main jata {session: { [], [] }}
-     } catch (error) {  
-        console.error("Error in createSession controller:", error);
-    const message = error.message || "Internal Server Error";
-    res.status(500).json({ message });
-     }
+      res.status(201).json({ session }) //bina curly braces ke list type main jata [ { }, { } ], with curly braces main jata {session: { [], [] }}
+   } catch (error) {
+      console.error("Error in createSession controller:", error);
+      const message = error.message || "Internal Server Error";
+      res.status(500).json({ message });
+   }
 
 }
 
-export async function getActiveSessions(req,res){ // here req is not being used you can put underscore there
+export async function getActiveSessions(req, res) { // here req is not being used you can put underscore there
 
    try {
-       const sessions =await  Session.find({status:"active"}).populate("host","name profileImage email clerkId").populate("host","name profileImage email clerkId"). // look for now it is only checking active sessions, what if any session is not active, think about that scenario also
+      const sessions = await Session.find({ status: "active" }).populate("host", "name profileImage email clerkId").populate("host", "name profileImage email clerkId"). // look for now it is only checking active sessions, what if any session is not active, think about that scenario also
 
-       sort({createdAt:-1}).limit(20)
+         sort({ createdAt: -1 }).limit(20)
 
-       res.status(200).json({sessions})
+      res.status(200).json({ sessions })
    } catch (error) {
-       console.log("Error in getActiveSessions controller: ",error.message)
-       return res.status(500).json({message: "Internal server error"})
+      console.log("Error in getActiveSessions controller: ", error.message)
+      return res.status(500).json({ message: "Internal server error" })
    }
 }
 
-export async function getMyRecentSessions(req,res){
+export async function getMyRecentSessions(req, res) {
 
    if (!req.user) {
       return res.status(401).json({ message: "Authentication required in getMYSessioncontroller" });
-    }
+   }
 
    try {
-      const userId =   req.user._id
+      const userId = req.user._id
       //get sesssions where either user is a host or participant
-      const sessions = await Session.find({status:"completed",
-         $or:[{host:userId},{participant:userId}],
-   }).sort({createdAt:-1}).limit(20);
+      const sessions = await Session.find({
+         status: "completed",
+         $or: [{ host: userId }, { participant: userId }],
+      }).sort({ createdAt: -1 }).limit(20);
 
-   return res.status(200).json({sessions}) //bina curly braces
-      
+      return res.status(200).json({ sessions }) //bina curly braces
+
    } catch (error) {
-      console.log("Error in getMyRecentSessions controller: ",error.message)
-        res.status(500).json({message: "Internal server error"})
+      console.log("Error in getMyRecentSessions controller: ", error.message)
+      res.status(500).json({ message: "Internal server error" })
    }
 }
 
 
-export async function getSessionById(req,res){
-try {
-   const {id} = req.params // jo router main pass kiye ho variable wahi karna hain, sessionRoute.get("/:id",protectRoute,getSessionById
-   console.log("Session ID from params: ", id)
-   
-   /*
-   OLD SCHOOL WAY
-   const params = req.params; // Pehle pura object lo
-const id = params.id;      // Phir usme se id nikalo
-   */
-
-   const session = await Session.findById(id).populate("host","name profileImage email clerkId").
-   populate("participant","name profileImage email clerkId")
-
-   if(!session) res.status(404).json({message:"Session not Found"})
-   res.status(200).json({session})
-} catch (error) {
-   console.log("Error in getSessionById controller: ",error.message)
-  return res.status(500).json({message: "Internal server error"})
-}
-
-}
-
-
-export async function joinSession(req,res){
+export async function getSessionById(req, res) {
    try {
-      const {id} = req.params
+      const { id } = req.params // jo router main pass kiye ho variable wahi karna hain, sessionRoute.get("/:id",protectRoute,getSessionById
+      console.log("Session ID from params: ", id)
+
+      /*
+      OLD SCHOOL WAY
+      const params = req.params; // Pehle pura object lo
+   const id = params.id;      // Phir usme se id nikalo
+      */
+
+      const session = await Session.findById(id).populate("host", "name profileImage email clerkId").
+         populate("participant", "name profileImage email clerkId")
+
+      if (!session) res.status(404).json({ message: "Session not Found" })
+      res.status(200).json({ session })
+   } catch (error) {
+      console.log("Error in getSessionById controller: ", error.message)
+      return res.status(500).json({ message: "Internal server error" })
+   }
+
+}
+
+
+export async function joinSession(req, res) {
+   try {
+      const { id } = req.params
       const userId = req.user._id
       const clerkId = req.user.clerkId
+      const { roomKey: providedRoomKey } = req.body
 
       const session = await Session.findById(id)
       //only to members are allowed so check it
-         if(!session) return res.status(404).json({message:"Session not Found"})
-         if(session.host.toString() === userId.toString()) return res.status(400).json({message:"Host cannot join as participant"})
+      if (!session) return res.status(404).json({ message: "Session not Found" })
+      if (session.host.toString() === userId.toString()) return res.status(400).json({ message: "Host cannot join as participant" })
 
-      if(session.participant) return res.status(400).json({message:"Session is Full"})  
+      // Allow existing participant to rejoin without key check
+      if (session.participant) {
+         if (session.participant.toString() === userId.toString()) {
+            return res.status(200).json({ session, message: "Re-joined session successfully" })
+         }
+         return res.status(400).json({ message: "Session is Full" })
+      }
+
+      // Room key validation for new participants
+      if (!providedRoomKey) {
+         return res.status(403).json({ message: "Room key is required to join this session" })
+      }
+      if (providedRoomKey.toString() !== session.roomKey.toString()) {
+         return res.status(403).json({ message: "Invalid room key. Please check and try again." })
+      }
+
       session.participant = userId
       await session.save()
-      
-      const channel = chatClient.channel("messaging",session.callId)
+
+      const channel = chatClient.channel("messaging", session.callId)
       await channel.addMembers([clerkId])
       /**
       
@@ -147,50 +165,85 @@ export async function joinSession(req,res){
       Kaam kya hai? User ko us specific room ka Official Member banana taaki wo chat/call kar paye. 
 
        */
-   return res.status(200).json({session,message:"Joined session successfully"})
+      return res.status(200).json({ session, message: "Joined session successfully" })
 
    } catch (error) {
-         console.log("Error in joinSession controller: ",error.message)
-   return res.status(500).json({message: "Internal server error"})
+      console.log("Error in joinSession controller: ", error.message)
+      return res.status(500).json({ message: "Internal server error" })
    }
 }
 
 
-export async function endSession(req,res){
+export async function endSession(req, res) {
    try {
-      const {id} = req.params
-      const userId =  req.user._id
+      const { id } = req.params
+      const userId = req.user._id
 
       const session = await Session.findById(id)
-      if(!session) return res.status(404).json({message:"Session doesnt exist"})
+      if (!session) return res.status(404).json({ message: "Session doesnt exist" })
 
       //check if user is host   
-      if(session.host.toString()!= userId.toString()){ // hence  type: mongoose.Schema.Types.ObjectId means that moongose id, not that normal id
-         return res.status(403).json({message:"Only host can end session"})
+      if (session.host.toString() != userId.toString()) { // hence  type: mongoose.Schema.Types.ObjectId means that moongose id, not that normal id
+         return res.status(403).json({ message: "Only host can end session" })
       }
 
-      if(session.status==="completed"){
-         return res.status(403).json({message:"Session already completed"})
+      if (session.status === "completed") {
+         return res.status(403).json({ message: "Session already completed" })
       }
 
       //now delete video call
 
       //first grab the videocall by id
-      const call = streamClient.video.call("default",session.callId);
-      await call.delete({hard:true})
+      const call = streamClient.video.call("default", session.callId);
+      await call.delete({ hard: true })
 
       //now delete chat
-      const channel = chatClient.channel("messaging",session.callId);
+      const channel = chatClient.channel("messaging", session.callId);
       await channel.delete();
 
       session.status = "completed"
       await session.save()
 
-     return res.status(200).json({session,message:"Session ended successfully"})
+      return res.status(200).json({ session, message: "Session ended successfully" })
 
 
    } catch (error) {
-      console.log("Error in endSession controller: ",error.message)
-      return res.status(500).json({message: "Internal server error"})
+      console.log("Error in endSession controller: ", error.message)
+      return res.status(500).json({ message: "Internal server error" })
+   }
+}
+
+export async function leaveSession(req, res) {
+   try {
+      const { id } = req.params;
+      const userId = req.user._id;
+
+      const session = await Session.findById(id);
+      if (!session) return res.status(404).json({ message: "Session not found" });
+
+      if (session.participant && session.participant.toString() === userId.toString()) {
+         session.participant = null;
+         await session.save();
+         // Remove from chat channel if possible? 
+         /* 
+            The stream-chat-js library allows removing members. 
+            We should probably do that so they don't get notifications/access. 
+         */
+         try {
+            const channel = chatClient.channel("messaging", session.callId);
+            await channel.removeMembers([req.user.clerkId]);
+         } catch (err) {
+            console.error("Failed to remove member from chat:", err);
+            // Continue anyway
+         }
+
+         return res.status(200).json({ message: "Left session successfully" });
+      }
+
+      return res.status(200).json({ message: "User was not a participant" });
+
+   } catch (error) {
+      console.log("Error in leaveSession controller: ", error.message);
+      return res.status(500).json({ message: "Internal server error" });
    }
 }
