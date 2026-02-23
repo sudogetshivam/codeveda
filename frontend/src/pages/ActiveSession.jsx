@@ -9,8 +9,10 @@ import {
 } from "lucide-react";
 import { Link } from "react-router";
 import { getDifficultyBadgeClass } from "../lib/utils";
+import { useState } from "react";
 
 function ActiveSessions({ sessions, isLoading, isUserInSession }) {
+  const ids =  sessions.map(session => (session._id.slice(-6)))
   return (
     <div className="lg:col-span-2 card bg-base-100 border-2 border-primary/20 hover:border-primary/30 h-full">
       <div className="card-body">
@@ -52,7 +54,7 @@ function ActiveSessions({ sessions, isLoading, isUserInSession }) {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="font-bold text-lg truncate">{session.problem}</h3>
+                        <h3 className="font-bold text-lg truncate">{`Session-${ids}`}</h3>
                         <span
                           className={`badge badge-sm ${getDifficultyBadgeClass(
                             session.difficulty
