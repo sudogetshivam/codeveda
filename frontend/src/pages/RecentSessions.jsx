@@ -3,6 +3,7 @@ import { getDifficultyBadgeClass } from "../lib/utils";
 import { formatDistanceToNow } from "date-fns";
 
 function RecentSessions({ sessions, isLoading }) {
+    const ids =  sessions.map(session => (session._id.slice(-6)))
   return (
     <div className="card bg-base-100 border-2 border-accent/20 hover:border-accent/30 mt-8">
       <div className="card-body">
@@ -49,7 +50,7 @@ function RecentSessions({ sessions, isLoading }) {
                       <Code2 className="w-6 h-6 text-white" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-bold text-base mb-1 truncate">{session.problem}</h3>
+                      <h3 className="font-bold text-base mb-1 truncate">{`Session-${ids[sessions.indexOf(session)]}`}</h3>
                       <span
                         className={`badge badge-sm ${getDifficultyBadgeClass(session.difficulty)}`}
                       >
